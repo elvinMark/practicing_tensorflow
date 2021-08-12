@@ -27,6 +27,8 @@ parser.add_argument("--path",type=str,default="./saved_models",help="specified t
 
 
 args = parser.parse_args()
+args.T_max = args.epochs
+args.path = os.path.join(args.path,args.experiment)
 
 model = create_model(args)
 train_ds, test_ds = create_datasets(args)
@@ -34,7 +36,13 @@ train_ds, test_ds = create_datasets(args)
 optim = create_optimizer(args)
 crit = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 sched_callback = tf.keras.callbacks.LearningRateScheduler(create_scheduler(args))
+model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+    filepath=args.path,
+    monitor="accuracy",
+    save_weights_only=True,
+    save_best_only=True,
+    mode="max")
 
 model.compile(optimizer=optim,loss=crit,metrics=["accuracy"])
-model.fit(train_ds,epochs=args.epochs,callbacks=[sched_callback])
+model.fit(train_ds,epochs=args.epochs,callbacks=[sched_callback,model_checkpoint_callback])
 model.evaluate(test_ds)
