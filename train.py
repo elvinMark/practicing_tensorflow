@@ -7,6 +7,7 @@ from models import create_model
 from datasets import create_datasets
 from optimizers import create_optimizer
 from schedulers import create_scheduler
+from utils import train
 
 parser =argparse.ArgumentParser(description="train helper")
 parser.add_argument("--dataset",type=str,default="mnist",choices=["mnist","cifar10","cifar100"],help="choose the dataset to train")
@@ -43,6 +44,9 @@ model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
     save_best_only=True,
     mode="max")
 
-model.compile(optimizer=optim,loss=crit,metrics=["accuracy"])
-model.fit(train_ds,epochs=args.epochs,callbacks=[sched_callback,model_checkpoint_callback])
-model.evaluate(test_ds)
+# model.compile(optimizer=optim,loss=crit,metrics=["accuracy"])
+
+# model.fit(train_ds,epochs=args.epochs,callbacks=[sched_callback,model_checkpoint_callback])
+# model.evaluate(test_ds)
+ 
+train(model,train_ds,test_ds,crit,optim,None,args.epochs)
